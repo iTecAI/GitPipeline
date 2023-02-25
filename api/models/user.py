@@ -3,6 +3,7 @@ from pymongo.database import Database
 from hashlib import sha256
 import time
 from typing import TypedDict, Union
+from github.AuthenticatedUser import AuthenticatedUser
 
 class GithubAccount(TypedDict):
     token: Union[str, None]
@@ -15,20 +16,38 @@ class User(BaseORM):
     TYPE = "user"
     COLLECTION = "users"
 
-    def __init__(self, id: str, db, username: str, password_hash: str, accounts: list[GithubAccount] = [], **kwargs):
+    def __init__(self, id: str, db, username: str, password_hash: str, user_type: str, accounts: list[GithubAccount] = [], **kwargs):
         super().__init__(id, db, **kwargs)
         self.username = username
         self.password_hash = password_hash
         self.accounts = accounts
+        self.user_type = user_type
     
     @classmethod
     def create(cls, db: Database, username: str, password: str) -> "User":
-        created = User(cls.generate_uuid(), db, username, sha256(password.encode("utf-8")).hexdigest())
+        created = User(cls.generate_uuid(), db, username, sha256(password.encode("utf-8")).hexdigest(), "manual")
+        created.save()
+        return created
+
+    @classmethod
+    def create_from_github(cls, db: Database, user: AuthenticatedUser, token: str) -> "User":
+        created = User(cls.generate_uuid(), db, user.login, cls.encode_user_to_secret(user), "github", accounts=[
+            GithubAccount(
+                token=token,
+                username=user.login,
+                avatar=user.avatar_url,
+                id=user.id
+            )
+        ])
         created.save()
         return created
 
     def login(self) -> "Session":
         return Session.create(self.db, self)
+    
+    @staticmethod
+    def encode_user_to_secret(user: AuthenticatedUser) -> str:
+        return "_gh_auth-" + sha256(f"{user.login}-{user.id}".encode("utf-8")).hexdigest()
 
 class Session(BaseORM):
     TYPE = "session"
