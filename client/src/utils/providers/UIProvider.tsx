@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
-import {MantineProvider} from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 
-export function UIProvider(props: {children: ReactNode}): JSX.Element {
+export function UIProvider(props: { children: ReactNode }): JSX.Element {
     return (
         <MantineProvider
             inherit
@@ -10,7 +11,7 @@ export function UIProvider(props: {children: ReactNode}): JSX.Element {
             withGlobalStyles
             withNormalizeCSS
         >
-            {props.children}
+            <ModalsProvider>{props.children}</ModalsProvider>
         </MantineProvider>
     );
 }

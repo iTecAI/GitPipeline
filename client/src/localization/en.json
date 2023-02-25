@@ -1,3 +1,39 @@
 {
-    "app": "GitPipeline"
+    "app": "GitPipeline",
+    "pages": {
+        "login": {
+            "logo_alt": "GitPipeline Logo",
+            "github_signin": "Sign In With Github",
+            "create_account": {
+                "button": "Create Account",
+                "email": {
+                    "label": "Email",
+                    "placeholder": "you@example.com",
+                    "error": "Invalid email"
+                },
+                "password": {
+                    "label": "Password",
+                    "confirmLabel": "Confirm Password",
+                    "error": "Passwords do not match"
+                },
+                "submit": "Create Account"
+            },
+            "login": {
+                "button": "Log In",
+                "email": {
+                    "label": "Email",
+                    "placeholder": "you@example.com",
+                    "error": "Invalid email"
+                },
+                "password": {
+                    "label": "Password",
+                    "error": "Passwords do not match"
+                },
+                "submit": "Log In"
+            }
+        }
+    },
+    "generic": {
+        "or": "or"
+    }
 }
