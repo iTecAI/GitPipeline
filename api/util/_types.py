@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from pymongo.database import Database
 from typing import TypedDict
-from starlite import Starlite
+from starlite import State
 
 @dataclass
 class AppState:
     database: Database
 
-def get_app_state(app: Starlite) -> AppState:
+def get_app_state(state: State) -> AppState:
     return AppState(
-        database=app.state.database
+        database=state.database
     )
 
 class ErrorResponse(TypedDict):

@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from urllib.parse import quote_plus
 from pydantic import BaseModel
+import uuid
 
 
 class BaseORM:
@@ -64,14 +65,25 @@ class BaseORM:
         else:
             result = [i for i in db[cls.COLLECTION].find(query)]
             return [cls.from_dict(i, db) for i in result]
+    
+    @classmethod
+    def create(cls, db: Database, **kwargs):
+        raise NotImplementedError("create() is not implemented for this ORM")
+
+    @staticmethod
+    def generate_uuid() -> str:
+        return uuid.uuid4().hex
 
 
 class ORMPlugin(PluginProtocol[BaseORM]):
     def orm_start(self, state: State):
         client = MongoClient(
-            f"mongodb://{quote_plus(self.env['db']['user'])}:{quote_plus(self.env['db']['user'])}@{self.env['db']['host']}/?ssl={'true' if self.env['db']['ssl'] else 'false'}"
+            f"mongodb://{self.env['db']['host']}/?ssl={'true' if self.env['db']['ssl'] else 'false'}",
+            username=self.env["db"]["user"],
+            password=self.env["db"]["password"]
         )
         self.database = client[self.env['db']['database']]
+        print(self.env)
         state.database = self.database
 
     def on_app_init(self, app: Starlite) -> None:

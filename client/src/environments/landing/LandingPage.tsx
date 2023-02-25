@@ -7,6 +7,8 @@ import {IoLogoGithub} from "react-icons/io";
 import { useForm } from "@mantine/form";
 import { validateEmail } from "../../utils/validators";
 import { closeAllModals, openModal } from "@mantine/modals";
+import { post } from "../../utils/api";
+import { LoginResponse } from "../../types/user";
 
 function CreateAccountModal() {
     const {t} = useTranslation();
@@ -36,7 +38,11 @@ function CreateAccountModal() {
         <form
             className="create-account-form"
             onSubmit={form.onSubmit((value) => {
-                console.log(value);
+                post<LoginResponse>("/users", {data: {email: value.email, password: value.password}}).then((result) => {
+                    if (result.success) {
+                        console.log(result.data);
+                    }
+                })
                 closeAllModals();
             })}
         >
