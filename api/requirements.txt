@@ -3,3 +3,4 @@ starlite
 uvicorn
 pymongo
 python-dotenv
+coloredlogs

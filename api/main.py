@@ -4,8 +4,11 @@ from models import *
 from util import exception_handler, get_app_state
 import time
 import logging
+import coloredlogs
+import os
+os.environ["COLOREDLOGS_LOG_FORMAT"] = "%(asctime)s : %(levelname)s : %(filename)s:%(funcName)s @ %(lineno)dL > %(message)s"
 
-logging.basicConfig(level="DEBUG", format="%(asctime)s : %(levelname)s : %(filename)s:%(funcName)s @ %(lineno)dL > %(message)s")
+coloredlogs.install(level="DEBUG")
 
 @get("/")
 async def root() -> dict:
