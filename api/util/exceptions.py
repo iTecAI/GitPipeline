@@ -7,7 +7,8 @@ import traceback
 def exception_handler(r: Request, exc: Exception) -> Response:
     status_code = getattr(exc, "status_code", HTTP_500_INTERNAL_SERVER_ERROR)
     detail = getattr(exc, "detail", "")
-    logging.exception("ERR")
+    if status_code == HTTP_500_INTERNAL_SERVER_ERROR:
+        logging.exception("Server error encountered:\n")
 
     return Response(
         content=ErrorResponse(detail=detail, error="".join(traceback.format_exception(exc))),
