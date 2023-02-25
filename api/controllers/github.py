@@ -1,13 +1,15 @@
+from typing import Optional
 from starlite import Controller, get, Provide
-from util._types import AppState
+from util._types import AppState, PaginatedResponse
 from util.exceptions import ApplicationException
 from util.guards import is_logged_in
 from util.dependencies import dep_user
 import uuid
-from urllib.parse import quote
+from urllib.parse import quote, parse_qs, urlparse
 from pydantic import BaseModel
 from requests import post, Response
 from github import Github
+from github.Repository import Repository
 from models.user import User, GithubAccount
 
 SCOPES = ["repo", "admin:repo_hook", "user", "workflow"]
@@ -21,6 +23,10 @@ class AuthResult(BaseModel):
 class GithubRepository(BaseModel):
     id: int
     name: str
+
+    @classmethod
+    def from_repo(cls, repo: Repository):
+        return cls(id=repo.id, name=repo.name)
 
 class GithubController(Controller):
     path = "/gh"
@@ -73,7 +79,24 @@ class GithubController(Controller):
 class GithubUserController(Controller):
     path="/gh/{username:str}"
 
-    @get("/repositories", guards=[is_logged_in], dependencies={"user": Provide(dep_user)})
-    async def list_user_repositories(self, app_state: AppState, username: str, user: User) -> list[GithubRepository]:
+    @get("/repositories/count", guards=[is_logged_in], dependencies={"user": Provide(dep_user)})
+    async def count_user_repositories(self, username: str, user: User) -> int:
         gh_user = user.get_github(username)
-        return [GithubRepository(id=r.id, name=r.name) for r in gh_user.get_repos()]
+        return gh_user.get_repos().totalCount
+    
+    @get("/repositories", guards=[is_logged_in], dependencies={"user": Provide(dep_user)})
+    async def get_user_repositories(self, username: str, user: User, page: Optional[int] = 0) -> PaginatedResponse:
+        gh_user = user.get_github(username)
+        repos = gh_user.get_repos(sort="updated")
+        last_page = int(parse_qs(urlparse(repos._getLastPageUrl()).query)["page"][0])
+        if page < 0 or page >= last_page:
+            raise ApplicationException(code=400, error_name="err.pagination.invalid_page")
+
+        return PaginatedResponse(
+            count=repos.totalCount,
+            pages=last_page,
+            current_page=page,
+            page_content=[GithubRepository.from_repo(i) for i in repos.get_page(page)],
+            previous=f"/gh/{username}/repositories?page={page - 1}" if page > 0 else None,
+            next=f"/gh/{username}/repositories?page={page + 1}" if page < last_page - 1 else None
+        )

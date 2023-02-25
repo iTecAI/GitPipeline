@@ -12,7 +12,7 @@ import {
     Group,
     UnstyledButton,
     useMantineTheme,
-    Badge,
+    Loader,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,19 +20,21 @@ import { IoLogoGithub } from "react-icons/io";
 import { MdLogout, MdStar } from "react-icons/md";
 import { Outlet, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo512.png";
-import { GithubAccount, GithubRepository } from "../../types/githubAccounts";
+import { GithubAccount } from "../../types/githubAccounts";
 import { del, get } from "../../utils/api";
 import { useLogin } from "../../utils/providers/LoginState";
 import "./layout.scss";
 
 function GHAccountCard(props: {account: GithubAccount}): JSX.Element {
-    const [repos, setRepos] = useState<GithubRepository[]>([]);
+    const [repos, setRepos] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
     useEffect(() => {
-        get<GithubRepository[]>(`/gh/${props.account.username}/repositories`).then((result) => {
+        get<number>(`/gh/${props.account.username}/repositories/count`).then((result) => {
             if (result.success) {
                 setRepos(result.data);
+                setLoading(false);
             }
-        })
+        });
     }, [props.account]);
 
     return (
@@ -44,12 +46,12 @@ function GHAccountCard(props: {account: GithubAccount}): JSX.Element {
             p="md"
             withBorder
         >
-            <Avatar src={props.account.avatar} className="img" radius="xl" />
+            {loading ? <Loader className="img" /> : <Avatar src={props.account.avatar} className="img" radius="xl" />}
             <Text fz="lg" className="username">
                 {props.account.username}
             </Text>
             <Text color="dimmed" size="xs" className="repos">
-                {repos.length} Repositories
+                {repos} Repositories
             </Text>
         </Paper>
     );

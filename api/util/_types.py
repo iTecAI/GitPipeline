@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from pymongo.database import Database
-from typing import TypedDict
+from typing import TypedDict, Any, Union
 from starlite import State
+from pydantic import BaseModel
 
 @dataclass
 class AppState:
@@ -23,3 +24,12 @@ def get_app_state(state: State) -> AppState:
 class ErrorResponse(TypedDict):
     detail: str
     error: str
+
+
+class PaginatedResponse(BaseModel):
+    count: int
+    pages: int
+    current_page: int
+    page_content: list[Any]
+    previous: Union[None, str]
+    next: Union[None, str]
