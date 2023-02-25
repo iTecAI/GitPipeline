@@ -2,3 +2,4 @@ PyGithub
 starlite
 uvicorn
 pymongo
+python-dotenv
