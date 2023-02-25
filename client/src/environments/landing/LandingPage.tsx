@@ -21,7 +21,7 @@ import { IoLogoGithub } from "react-icons/io";
 import { useForm } from "@mantine/form";
 import { validateEmail } from "../../utils/validators";
 import { closeAllModals, openModal } from "@mantine/modals";
-import { post } from "../../utils/api";
+import { get, post } from "../../utils/api";
 import { LoginResponse } from "../../types/user";
 import { useLogin } from "../../utils/providers/LoginState";
 import { showNotification } from "@mantine/notifications";
@@ -66,8 +66,8 @@ function CreateAccountModal() {
                         showNotification({
                             color: "teal",
                             icon: <MdCheckCircle />,
-                            title:t("pages.login.create_account.success"),
-                            message: t("generic.redirecting")
+                            title: t("pages.login.create_account.success"),
+                            message: t("generic.redirecting"),
                         });
                     }
                 });
@@ -105,7 +105,17 @@ function CreateAccountModal() {
                     label={(t("generic.or") ?? "OR").toUpperCase()}
                     labelPosition="center"
                 />
-                <Button color="dark" leftIcon={<IoLogoGithub size={20} />}>
+                <Button
+                    color="dark"
+                    leftIcon={<IoLogoGithub size={20} />}
+                    onClick={() =>
+                        get<string>("/gh/flow/1/login").then((result) => {
+                            if (result.success) {
+                                window.open(result.data, "_self");
+                            }
+                        })
+                    }
+                >
                     {t("pages.login.github_signin")}
                 </Button>
             </Stack>
@@ -169,7 +179,17 @@ function LoginModal() {
                     label={(t("generic.or") ?? "OR").toUpperCase()}
                     labelPosition="center"
                 />
-                <Button color="dark" leftIcon={<IoLogoGithub size={20} />}>
+                <Button
+                    color="dark"
+                    leftIcon={<IoLogoGithub size={20} />}
+                    onClick={() =>
+                        get<string>("/gh/flow/1/login").then((result) => {
+                            if (result.success) {
+                                window.open(result.data, "_self");
+                            }
+                        })
+                    }
+                >
                     {t("pages.login.github_signin")}
                 </Button>
             </Stack>

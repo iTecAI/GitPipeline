@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthTarget } from "./environments/authTarget/AuthTarget";
 import { LandingPage } from "./environments/landing/LandingPage";
 import { LayoutEnv } from "./environments/layout/Layout";
 import { LoginProvider } from "./utils/providers/LoginState";
@@ -14,6 +15,7 @@ function RouteContainer() {
                         <Route path="/" element={<LayoutEnv />}>
                             <Route path="login" element={<LandingPage />} />
                         </Route>
+                        <Route path="/auth/target" element={<AuthTarget />} />
                     </Routes>
                 </UIProvider>
             </LoginProvider>

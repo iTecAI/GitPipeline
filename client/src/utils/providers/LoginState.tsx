@@ -27,6 +27,9 @@ export function LoginProvider(props: {children: ReactNode}) {
                         sessionId: localStorage.getItem("token") as string,
                         userId: localStorage.getItem("user") as string,
                     });
+                } else {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
                 }
             })
         }

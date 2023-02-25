@@ -2,19 +2,28 @@ from .base import BaseORM
 from pymongo.database import Database
 from hashlib import sha256
 import time
+from typing import TypedDict, Union
+
+class GithubAccount(TypedDict):
+    token: Union[str, None]
+    username: str
+    avatar: str
+    id: int
+
 
 class User(BaseORM):
     TYPE = "user"
     COLLECTION = "users"
 
-    def __init__(self, id: str, db, email: str, password_hash: str, **kwargs):
+    def __init__(self, id: str, db, username: str, password_hash: str, accounts: list[GithubAccount] = [], **kwargs):
         super().__init__(id, db, **kwargs)
-        self.email = email
+        self.username = username
         self.password_hash = password_hash
+        self.accounts = accounts
     
     @classmethod
-    def create(cls, db: Database, email: str, password: str) -> "User":
-        created = User(cls.generate_uuid(), db, email, sha256(password.encode("utf-8")).hexdigest())
+    def create(cls, db: Database, username: str, password: str) -> "User":
+        created = User(cls.generate_uuid(), db, username, sha256(password.encode("utf-8")).hexdigest())
         created.save()
         return created
 

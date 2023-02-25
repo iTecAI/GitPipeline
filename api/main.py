@@ -1,4 +1,4 @@
-from starlite import Starlite, Provide, get
+from starlite import Starlite, Provide, get, State
 from starlite.status_codes import *
 from models import *
 from util import exception_handler, get_app_state
@@ -12,16 +12,20 @@ os.environ["COLOREDLOGS_LOG_FORMAT"] = "%(asctime)s : %(levelname)s : %(filename
 coloredlogs.install(level="DEBUG")
 
 @get("/")
-async def root() -> dict:
+async def root(state: State) -> dict:
     return {
         "time": time.ctime()
     }
 
-def init():
+def init(state: State):
     logging.info("Server online...")
+    state.gh_client = os.environ.get("CLIENT_ID")
+    state.gh_secret = os.environ.get("CLIENT_SECRET")
+    state.dev_mode = os.environ.get("DEV", "false").lower() == "true"
+    state.gh_redirect = os.environ.get("REDIRECT")
 
 app = Starlite(
-    route_handlers=[root, UserController],
+    route_handlers=[root, UserController, GithubController],
     plugins=[ORMPlugin()],
     exception_handlers={Exception: exception_handler},
     dependencies={"app_state": Provide(get_app_state)},
