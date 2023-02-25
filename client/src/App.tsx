@@ -6,23 +6,23 @@ import { LoginProvider } from "./utils/providers/LoginState";
 import { UIProvider } from "./utils/providers/UIProvider";
 
 function RouteContainer() {
-    return <BrowserRouter>
-        <Routes>
-            <Route path="/" element={<LayoutEnv />}>
-                <Route path="login" element={<LandingPage />} />
-            </Route>
-        </Routes>
-    </BrowserRouter>
+    return (
+        <BrowserRouter>
+            <LoginProvider>
+                <UIProvider>
+                    <Routes>
+                        <Route path="/" element={<LayoutEnv />}>
+                            <Route path="login" element={<LandingPage />} />
+                        </Route>
+                    </Routes>
+                </UIProvider>
+            </LoginProvider>
+        </BrowserRouter>
+    );
 }
 
 function App() {
-    return (
-        <UIProvider>
-            <LoginProvider>
-                <RouteContainer />
-            </LoginProvider>
-        </UIProvider>
-    );
+    return <RouteContainer />;
 }
 
 export default App;

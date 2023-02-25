@@ -83,7 +83,6 @@ class ORMPlugin(PluginProtocol[BaseORM]):
             password=self.env["db"]["password"]
         )
         self.database = client[self.env['db']['database']]
-        print(self.env)
         state.database = self.database
 
     def on_app_init(self, app: Starlite) -> None:

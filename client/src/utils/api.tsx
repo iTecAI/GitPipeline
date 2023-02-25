@@ -1,3 +1,7 @@
+import { showNotification } from "@mantine/notifications";
+import i18next from "i18next";
+import { MdError } from "react-icons/md";
+
 export type ApiResponse<T> =
     | {
           success: true;
@@ -12,7 +16,7 @@ export type ApiResponse<T> =
 export async function request<T>(
     method: "get" | "post" | "put" | "delete",
     path: string,
-    options?: { query?: { [key: string]: any }; data?: { [key: string]: any } }
+    options?: { query?: { [key: string]: any }; data?: { [key: string]: any }; notify?: boolean }
 ): Promise<ApiResponse<T>> {
     const queryParams: string =
         options && options.query
@@ -36,6 +40,19 @@ export async function request<T>(
     if (result.status < 400) {
         return { success: true, data: data };
     } else {
+        if (options && options.notify) {
+            showNotification({
+                title: i18next.t("generic.error") ?? "An error occurred",
+                message:
+                    i18next.t(
+                        data && typeof (data as any).detail === "string"
+                            ? (data as any).detail
+                            : "err.generic"
+                    ) ?? "Unknown error",
+                color: "red",
+                icon: <MdError />,
+            });
+        }
         return {
             success: false,
             code: result.status,
@@ -49,28 +66,36 @@ export async function request<T>(
 
 export async function get<T>(
     path: string,
-    options?: { query?: { [key: string]: any } }
+    options?: { query?: { [key: string]: any }; notify?: boolean }
 ): Promise<ApiResponse<T>> {
     return await request<T>("get", path, options);
 }
 
 export async function del<T>(
     path: string,
-    options?: { query?: { [key: string]: any } }
+    options?: { query?: { [key: string]: any }; notify?: boolean }
 ): Promise<ApiResponse<T>> {
     return await request<T>("delete", path, options);
 }
 
 export async function put<T>(
     path: string,
-    options?: { query?: { [key: string]: any }; data?: { [key: string]: any } }
+    options?: {
+        query?: { [key: string]: any };
+        data?: { [key: string]: any };
+        notify?: boolean;
+    }
 ): Promise<ApiResponse<T>> {
     return await request<T>("put", path, options);
 }
 
 export async function post<T>(
     path: string,
-    options?: { query?: { [key: string]: any }; data?: { [key: string]: any } }
+    options?: {
+        query?: { [key: string]: any };
+        data?: { [key: string]: any };
+        notify?: boolean;
+    }
 ): Promise<ApiResponse<T>> {
     return await request<T>("post", path, options);
 }

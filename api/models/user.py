@@ -24,6 +24,7 @@ class User(BaseORM):
 class Session(BaseORM):
     TYPE = "session"
     COLLECTION = "sessions"
+    SESSION_TIMEOUT = 86400
 
     def __init__(self, id: str, db: Database, last_interaction: float, user: str, **kwargs):
         super().__init__(id, db, **kwargs)
@@ -38,3 +39,11 @@ class Session(BaseORM):
         created = Session(cls.generate_uuid(), db, time.time(), user.id)
         created.save()
         return created
+
+    @property
+    def User(self) -> User:
+        try:
+            return User.load(self.db, id=self.user)
+        except:
+            raise KeyError(f"User with ID {self.user} not found.")
+

@@ -1,5 +1,8 @@
 {
     "app": "GitPipeline",
+    "layout": {
+        "logout": "Log Out"
+    },
     "pages": {
         "login": {
             "logo_alt": "GitPipeline Logo",
@@ -16,7 +19,8 @@
                     "confirmLabel": "Confirm Password",
                     "error": "Passwords do not match"
                 },
-                "submit": "Create Account"
+                "submit": "Create Account",
+                "success": "Account created!"
             },
             "login": {
                 "button": "Log In",
@@ -29,11 +33,20 @@
                     "label": "Password",
                     "error": "Passwords do not match"
                 },
-                "submit": "Log In"
+                "submit": "Log In",
+                "success": "Logged in!"
             }
         }
     },
     "generic": {
-        "or": "or"
+        "or": "or",
+        "error": "An error occurred",
+        "redirecting": "Redirecting..."
+    },
+    "err": {
+        "generic": "Unknown error occurred",
+        "auth": "Failed to authenticate",
+        "login": "Username or password invalid",
+        "account_creation": "User with provided email exists"
     }
 }

@@ -1,17 +1,35 @@
-import { Button, Center, Divider, Paper, PasswordInput, Stack, TextInput } from "@mantine/core";
+import {
+    Button,
+    Center,
+    Divider,
+    Paper,
+    PasswordInput,
+    Stack,
+    TextInput,
+} from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import Logo from "../../assets/logo.svg";
 import "./style.scss";
-import { MdAlternateEmail, MdLogin, MdPassword, MdPersonAdd } from "react-icons/md";
-import {IoLogoGithub} from "react-icons/io";
+import {
+    MdAlternateEmail,
+    MdCheckCircle,
+    MdLogin,
+    MdPassword,
+    MdPersonAdd,
+} from "react-icons/md";
+import { IoLogoGithub } from "react-icons/io";
 import { useForm } from "@mantine/form";
 import { validateEmail } from "../../utils/validators";
 import { closeAllModals, openModal } from "@mantine/modals";
 import { post } from "../../utils/api";
 import { LoginResponse } from "../../types/user";
+import { useLogin } from "../../utils/providers/LoginState";
+import { showNotification } from "@mantine/notifications";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function CreateAccountModal() {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const form = useForm({
         initialValues: {
             email: "",
@@ -33,16 +51,26 @@ function CreateAccountModal() {
                     : null,
         },
     });
+    const [_, auth] = useLogin();
 
     return (
         <form
             className="create-account-form"
             onSubmit={form.onSubmit((value) => {
-                post<LoginResponse>("/users", {data: {email: value.email, password: value.password}}).then((result) => {
+                post<LoginResponse>("/users/create", {
+                    data: { email: value.email, password: value.password },
+                    notify: true,
+                }).then((result) => {
                     if (result.success) {
-                        console.log(result.data);
+                        auth(result.data.session, result.data.user);
+                        showNotification({
+                            color: "teal",
+                            icon: <MdCheckCircle />,
+                            title:t("pages.login.create_account.success"),
+                            message: t("generic.redirecting")
+                        });
                     }
-                })
+                });
                 closeAllModals();
             })}
         >
@@ -77,7 +105,9 @@ function CreateAccountModal() {
                     label={(t("generic.or") ?? "OR").toUpperCase()}
                     labelPosition="center"
                 />
-                <Button color="dark" leftIcon={<IoLogoGithub size={20} />}>{t("pages.login.github_signin")}</Button>
+                <Button color="dark" leftIcon={<IoLogoGithub size={20} />}>
+                    {t("pages.login.github_signin")}
+                </Button>
             </Stack>
         </form>
     );
@@ -97,12 +127,26 @@ function LoginModal() {
                     : t("pages.login.login.email.error"),
         },
     });
+    const [_, auth] = useLogin();
 
     return (
         <form
             className="login-form"
             onSubmit={form.onSubmit((value) => {
-                console.log(value);
+                post<LoginResponse>("/users/login", {
+                    data: { email: value.email, password: value.password },
+                    notify: true,
+                }).then((result) => {
+                    if (result.success) {
+                        auth(result.data.session, result.data.user);
+                        showNotification({
+                            color: "teal",
+                            icon: <MdCheckCircle />,
+                            title: t("pages.login.login.success"),
+                            message: t("generic.redirecting"),
+                        });
+                    }
+                });
                 closeAllModals();
             })}
         >
@@ -135,6 +179,15 @@ function LoginModal() {
 
 export function LandingPage() {
     const { t } = useTranslation();
+    const [login] = useLogin();
+    const nav = useNavigate();
+
+    useEffect(() => {
+        if (login.loggedIn) {
+            nav("/");
+        }
+    }, [login]);
+
     return (
         <Paper p="sm" shadow="sm" className="landing-main">
             <Center>
