@@ -1,6 +1,8 @@
-from starlite import Controller, get
+from starlite import Controller, get, Provide
 from util._types import AppState
 from util.exceptions import ApplicationException
+from util.guards import is_logged_in
+from util.dependencies import dep_user
 import uuid
 from urllib.parse import quote
 from pydantic import BaseModel
@@ -15,6 +17,10 @@ class AuthResult(BaseModel):
     session_id: str
     user_id: str
     action: str
+
+class GithubRepository(BaseModel):
+    id: int
+    name: str
 
 class GithubController(Controller):
     path = "/gh"
@@ -63,3 +69,11 @@ class GithubController(Controller):
                 
         else:
             raise ApplicationException(code=403, error_name="err.github.state_invalid")
+    
+class GithubUserController(Controller):
+    path="/gh/{username:str}"
+
+    @get("/repositories", guards=[is_logged_in], dependencies={"user": Provide(dep_user)})
+    async def list_user_repositories(self, app_state: AppState, username: str, user: User) -> list[GithubRepository]:
+        gh_user = user.get_github(username)
+        return [GithubRepository(id=r.id, name=r.name) for r in gh_user.get_repos()]

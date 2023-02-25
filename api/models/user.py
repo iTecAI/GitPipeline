@@ -4,6 +4,8 @@ from hashlib import sha256, md5
 import time
 from typing import TypedDict, Union
 from github.AuthenticatedUser import AuthenticatedUser
+from github import Github
+from starlite.exceptions import HTTPException
 
 class GithubAccount(TypedDict):
     token: Union[str, None]
@@ -49,6 +51,20 @@ class User(BaseORM):
     @staticmethod
     def encode_user_to_secret(user: AuthenticatedUser) -> str:
         return "_gh_auth-" + sha256(f"{user.login}-{user.id}".encode("utf-8")).hexdigest()
+
+    def get_github(self, username: str) -> AuthenticatedUser:
+        for i in self.accounts:
+            if i["username"] == username:
+                if i["token"]:
+                    try:
+                        return Github(i["token"]).get_user()
+                    except:
+                        i["token"] = None
+                        self.save()
+                        raise HTTPException(status_code=403, detail="err.github.token_expired")
+                else:
+                    raise HTTPException(status_code=403, detail="err.github.token_expired")
+        raise HTTPException(status_code=404, detail="err.github.unknown_account")
 
 class Session(BaseORM):
     TYPE = "session"

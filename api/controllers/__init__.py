@@ -1,2 +1,2 @@
 from .users import UserController
-from .github import GithubController
+from .github import GithubController, GithubUserController

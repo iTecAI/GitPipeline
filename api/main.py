@@ -9,7 +9,7 @@ import os
 from controllers import *
 os.environ["COLOREDLOGS_LOG_FORMAT"] = "%(asctime)s : %(levelname)s : %(filename)s:%(funcName)s @ %(lineno)dL > %(message)s"
 
-coloredlogs.install(level="DEBUG")
+coloredlogs.install(level="INFO")
 
 @get("/")
 async def root(state: State) -> dict:
@@ -25,7 +25,7 @@ def init(state: State):
     state.gh_redirect = os.environ.get("REDIRECT")
 
 app = Starlite(
-    route_handlers=[root, UserController, GithubController],
+    route_handlers=[root, UserController, GithubController, GithubUserController],
     plugins=[ORMPlugin()],
     exception_handlers={Exception: exception_handler},
     dependencies={"app_state": Provide(get_app_state)},

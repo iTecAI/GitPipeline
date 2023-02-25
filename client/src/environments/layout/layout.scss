@@ -55,7 +55,14 @@
 
         .username {
             position: absolute;
-            top: 50%;
+            top: calc(50% - 10px);
+            left: 72px;
+            transform: translate(0, -50%);
+        }
+
+        .repos {
+            position: absolute;
+            top: calc(50% + 10px);
             left: 72px;
             transform: translate(0, -50%);
         }

@@ -14,23 +14,42 @@ import {
     useMantineTheme,
     Badge,
 } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoLogoGithub } from "react-icons/io";
 import { MdLogout, MdStar } from "react-icons/md";
 import { Outlet, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo512.png";
-import { GithubAccount } from "../../types/githubAccounts";
-import { del } from "../../utils/api";
+import { GithubAccount, GithubRepository } from "../../types/githubAccounts";
+import { del, get } from "../../utils/api";
 import { useLogin } from "../../utils/providers/LoginState";
 import "./layout.scss";
 
 function GHAccountCard(props: {account: GithubAccount}): JSX.Element {
+    const [repos, setRepos] = useState<GithubRepository[]>([]);
+    useEffect(() => {
+        get<GithubRepository[]>(`/gh/${props.account.username}/repositories`).then((result) => {
+            if (result.success) {
+                setRepos(result.data);
+            }
+        })
+    }, [props.account]);
+
     return (
-        <Paper className={`github-account-card${props.account.active ? " active" : " inactive"}`} shadow="xs" p="md" withBorder>
+        <Paper
+            className={`github-account-card${
+                props.account.active ? " active" : " inactive"
+            }`}
+            shadow="xs"
+            p="md"
+            withBorder
+        >
             <Avatar src={props.account.avatar} className="img" radius="xl" />
             <Text fz="lg" className="username">
                 {props.account.username}
+            </Text>
+            <Text color="dimmed" size="xs" className="repos">
+                {repos.length} Repositories
             </Text>
         </Paper>
     );
