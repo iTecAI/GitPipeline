@@ -1,7 +1,10 @@
 {
     "app": "GitPipeline",
     "layout": {
-        "logout": "Log Out"
+        "logout": "Log Out",
+        "nav": {
+            
+        }
     },
     "pages": {
         "login": {

@@ -6,6 +6,7 @@ from util.exceptions import *
 from hashlib import sha256
 from util.guards import is_logged_in
 from util.dependencies import dep_user, dep_session
+from typing import Optional
 
 
 class UserAuthenticateModel(BaseModel):
@@ -21,6 +22,8 @@ class LoginResponse(BaseModel):
 class UserInfo(BaseModel):
     username: str
     accounts: list
+    avatar: Optional[str] = None
+    type: str
 
 
 class UserController(Controller):
@@ -59,11 +62,12 @@ class UserController(Controller):
                 {
                     "active": bool(i["token"]),
                     "username": i["username"],
-                    "username": i["username"],
                     "avatar": i["avatar"],
                 }
                 for i in user.accounts
             ],
+            avatar=user.avatar,
+            type=user.user_type
         )
 
     @delete("", guards=[is_logged_in], dependencies={"session": Provide(dep_session)})

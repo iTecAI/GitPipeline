@@ -1,6 +1,6 @@
 from .base import BaseORM
 from pymongo.database import Database
-from hashlib import sha256
+from hashlib import sha256, md5
 import time
 from typing import TypedDict, Union
 from github.AuthenticatedUser import AuthenticatedUser
@@ -16,16 +16,17 @@ class User(BaseORM):
     TYPE = "user"
     COLLECTION = "users"
 
-    def __init__(self, id: str, db, username: str, password_hash: str, user_type: str, accounts: list[GithubAccount] = [], **kwargs):
+    def __init__(self, id: str, db, username: str, password_hash: str, user_type: str, accounts: list[GithubAccount] = [], avatar: str = None, **kwargs):
         super().__init__(id, db, **kwargs)
         self.username = username
         self.password_hash = password_hash
         self.accounts = accounts
         self.user_type = user_type
+        self.avatar = avatar
     
     @classmethod
     def create(cls, db: Database, username: str, password: str) -> "User":
-        created = User(cls.generate_uuid(), db, username, sha256(password.encode("utf-8")).hexdigest(), "manual")
+        created = User(cls.generate_uuid(), db, username, sha256(password.encode("utf-8")).hexdigest(), "manual", avatar=f"https://www.gravatar.com/avatar/{md5(username.strip().lower().encode('utf-8')).hexdigest()}?d=identicon")
         created.save()
         return created
 
@@ -38,7 +39,7 @@ class User(BaseORM):
                 avatar=user.avatar_url,
                 id=user.id
             )
-        ])
+        ], avatar=user.avatar_url if user.avatar_url else None)
         created.save()
         return created
 

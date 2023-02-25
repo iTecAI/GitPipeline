@@ -16,7 +16,7 @@
 
     .app-name {
         font-weight: 400;
-        font-family: 'Roboto Mono', 'Roboto', sans-serif;
+        font-family: "Roboto Mono", "Roboto", sans-serif;
         position: absolute;
         top: 50%;
         left: 56px;
@@ -35,4 +35,54 @@
     height: calc(100vh - 48px);
     padding-top: 16px;
     min-height: 0px;
+}
+
+.sidenav {
+    display: inline-block;
+    width: calc(min(320px, 30%));
+    height: calc(100% - 48px);
+    box-sizing: border-box;
+
+    .github-account-card {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        height: 72px;
+        background-color: var(--mantine-color-dark-8);
+        border-radius: 4px;
+        white-space: nowrap;
+        box-sizing: border-box;
+
+        .username {
+            position: absolute;
+            top: 50%;
+            left: 72px;
+            transform: translate(0, -50%);
+        }
+
+        &.active {
+            border-color: var(--mantine-color-green-8);
+        }
+
+        &.inactive {
+            border-color: var(--mantine-color-red-8);
+        }
+    }
+
+    .gh-account-section {
+        position: relative;
+        width: 100%;
+        height: calc(100% - 72px);
+        overflow-y: auto;
+    }
+}
+
+.user-box {
+    position: relative;
+    box-sizing: border-box;
+    .user-type {
+        position: absolute;
+        bottom: 6px;
+        left: 36px;
+    }
 }
