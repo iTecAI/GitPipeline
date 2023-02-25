@@ -1,0 +1,25 @@
+.app-header {
+    position: relative;
+    .logo {
+        position: absolute;
+        top: 0px;
+        left: 8px;
+        display: inline-block;
+        width: auto;
+        height: 100%;
+
+        img {
+            width: auto;
+            height: 100%;
+        }
+    }
+
+    .app-name {
+        font-weight: 400;
+        font-family: 'Roboto Mono', 'Roboto', sans-serif;
+        position: absolute;
+        top: 50%;
+        left: 56px;
+        transform: translate(0, -50%);
+    }
+}
