@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoLogoGithub } from "react-icons/io";
 import { MdLogout, MdStar } from "react-icons/md";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import Logo from "../../assets/logo512.png";
 import { GithubAccount } from "../../types/githubAccounts";
 import { del, get } from "../../utils/api";
@@ -28,6 +28,8 @@ import "./layout.scss";
 function GHAccountCard(props: {account: GithubAccount}): JSX.Element {
     const [repos, setRepos] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
+    const nav = useNavigate();
+    const {gh_account} = useParams();
     useEffect(() => {
         get<number>(`/gh/${props.account.username}/repositories/count`).then((result) => {
             if (result.success) {
@@ -41,10 +43,11 @@ function GHAccountCard(props: {account: GithubAccount}): JSX.Element {
         <Paper
             className={`github-account-card${
                 props.account.active ? " active" : " inactive"
-            }`}
+            }${gh_account === props.account.username ? " selected" : ""}`}
             shadow="xs"
             p="md"
             withBorder
+            onClick={() => nav(`/repositories/${props.account.username}`)}
         >
             {loading ? <Loader className="img" /> : <Avatar src={props.account.avatar} className="img" radius="xl" />}
             <Text fz="lg" className="username">
@@ -131,6 +134,7 @@ export function LayoutEnv() {
     return (
         <AppShell
             padding={"md"}
+            className="layout-shell"
             header={
                 <Header height={48} p="xs" className="app-header">
                     <Avatar size="lg" src={Logo} className="logo" />

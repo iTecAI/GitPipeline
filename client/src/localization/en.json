@@ -1,10 +1,7 @@
 {
     "app": "GitPipeline",
     "layout": {
-        "logout": "Log Out",
-        "nav": {
-            
-        }
+        "logout": "Log Out"
     },
     "pages": {
         "login": {
@@ -39,6 +36,10 @@
                 "submit": "Log In",
                 "success": "Logged in!"
             }
+        },
+        "repos": {
+            "search": "Search Repositories",
+            "search_placeholder": "Repository Name..."
         }
     },
     "generic": {

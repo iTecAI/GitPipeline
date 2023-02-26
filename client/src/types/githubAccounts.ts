@@ -7,4 +7,8 @@ export type GithubAccount = {
 export type GithubRepository = {
     id: number;
     name: string;
+    url: string;
+    forks: number;
+    stars: number;
+    watchers: number;
 };

@@ -31,10 +31,18 @@
     }
 }
 
-.mantine-AppShell-main {
+.layout-shell .mantine-AppShell-main {
+    display: inline-block;
     height: calc(100vh - 48px);
+    width: calc(100vw - min(320px, 30%));
     padding-top: 16px;
     min-height: 0px;
+    flex: none;
+    position: absolute;
+    top: 48pxpx;
+    left: calc(min(320px, 30%));
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .sidenav {
@@ -52,6 +60,11 @@
         border-radius: 4px;
         white-space: nowrap;
         box-sizing: border-box;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--mantine-color-dark-6);
+        }
 
         .username {
             position: absolute;
@@ -73,6 +86,10 @@
 
         &.inactive {
             border-color: var(--mantine-color-red-8);
+        }
+
+        &.selected {
+            background-color: var(--mantine-color-dark-6);
         }
     }
 

@@ -1,0 +1,34 @@
+.repo-load {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.repo-box {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: calc(100% - 8px);
+    overflow: hidden;
+
+    .mantine-Stack-root {
+        height: 100%;
+        position: relative;
+        .repo-list {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: calc(100% - 116px);
+            overflow-y: auto;
+
+            .repo-item {
+                background-color: var(--mantine-color-dark-6);
+            }
+        }
+        .pagination {
+            margin-right: 0px;
+            margin-left: auto;
+        }
+    }
+}
