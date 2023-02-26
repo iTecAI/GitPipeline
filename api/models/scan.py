@@ -62,9 +62,9 @@ class Scan(BaseORM):
         except:
             raise RuntimeError
     
-    def update(self):
+    def update(self, repository: Repository):
         try:
-            archive_link = self.repository.get_archive_link("zipball", self.branch)
+            archive_link = repository.get_archive_link("zipball", self.branch)
             r = requests.get(archive_link, stream=True)
             with tempfile.TemporaryFile("w+b") as temp:
                 for chunk in r.iter_content(chunk_size=8192):
@@ -81,6 +81,7 @@ class Scan(BaseORM):
                             size = os.stat(os.path.join(result[0], f)).st_size
                             files.append(ScanFile(directory=head, name=f, size=size, parseable=self.check_parseable(os.path.split(head)[1].lower(), f.lower())))
             self.files = files
+            self.timestamp = time.time()
             self.save()
         
         except:

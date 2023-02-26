@@ -193,7 +193,7 @@ class GithubRepositoryController(Controller):
         if len(results) == 0:
             return Scan.scan(app_state.database, username, repo, branch=branch)
         else:
-            results[0].update()
+            results[0].update(repo)
             return results[0]
     
     @get("/branches")
