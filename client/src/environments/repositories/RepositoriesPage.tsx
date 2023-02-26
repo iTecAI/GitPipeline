@@ -134,7 +134,7 @@ export function RepositoriesPage() {
                     {loading ? (
                         <Loader size="xl" className="repo-load" />
                     ) : (
-                        <Stack spacing={4}>
+                        <Stack spacing={8}>
                             {repos.map((v, i) => (
                                 <RepositoryItem {...v} key={i} />
                             ))}
