@@ -40,12 +40,17 @@
         "repos": {
             "search": "Search Repositories",
             "search_placeholder": "Repository Name..."
+        },
+        "repo_details": {
+            "scanned": "Scanned",
+            "scan_button": "Scan Branch"
         }
     },
     "generic": {
         "or": "or",
         "error": "An error occurred",
-        "redirecting": "Redirecting..."
+        "redirecting": "Redirecting...",
+        "never": "Never"
     },
     "err": {
         "generic": "Unknown error occurred",

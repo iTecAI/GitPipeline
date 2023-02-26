@@ -24,8 +24,9 @@ import { GoRepoForked } from "react-icons/go";
 
 function RepositoryItem(props: GithubRepository) {
     const theme = useMantineTheme();
+    const nav = useNavigate();
     return (
-        <Paper className="repo-item" p="xs">
+        <Paper className="repo-item" p="xs" onClick={() => nav(`./${props.id}`)}>
             <Stack spacing={4}>
                 <Text className="repo-name" size="md">
                     {props.name}

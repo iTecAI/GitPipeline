@@ -25,7 +25,7 @@ def init(state: State):
     state.gh_redirect = os.environ.get("REDIRECT")
 
 app = Starlite(
-    route_handlers=[root, UserController, GithubController, GithubUserController],
+    route_handlers=[root, UserController, GithubController, GithubUserController, GithubRepositoryController],
     plugins=[ORMPlugin()],
     exception_handlers={Exception: exception_handler},
     dependencies={"app_state": Provide(get_app_state)},

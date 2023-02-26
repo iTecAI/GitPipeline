@@ -1,5 +1,5 @@
 from typing import Optional, Union
-from starlite import Controller, get, Provide
+from starlite import Controller, get, Provide, post, Request
 from util._types import AppState, PaginatedResponse
 from util.exceptions import ApplicationException
 from util.guards import is_logged_in
@@ -7,10 +7,12 @@ from util.dependencies import dep_user
 import uuid
 from urllib.parse import quote, parse_qs, urlparse
 from pydantic import BaseModel
-from requests import post, Response
+from requests import Response
+import requests
 from github import Github
 from github.Repository import Repository
 from models.user import User, GithubAccount
+from models.scan import Scan
 
 SCOPES = ["repo", "admin:repo_hook", "user", "workflow"]
 DEV_URL = "http://localhost:3000"
@@ -31,6 +33,7 @@ class GithubRepository(BaseModel):
     watchers: int
     language: Union[str, None]
     visibility: str
+    default_branch: str
 
     @classmethod
     def from_repo(cls, repo: Repository):
@@ -42,7 +45,8 @@ class GithubRepository(BaseModel):
             stars=repo.stargazers_count,
             watchers=repo.watchers_count,
             language=repo.language,
-            visibility=repo.visibility
+            visibility=repo.visibility,
+            default_branch=repo.default_branch
         )
 
 
@@ -62,7 +66,7 @@ class GithubController(Controller):
     ) -> AuthResult:
         if state_key in self.pending:
             self.pending.remove(state_key)
-            response: Response = post(
+            response: Response = requests.post(
                 "https://github.com/login/oauth/access_token",
                 params={
                     "client_id": app_state.gh_client,
@@ -160,3 +164,39 @@ class GithubUserController(Controller):
             if page < last_page - 1
             else None,
         )
+
+def dep_github(user: User, username: str) -> Github:
+    return user.get_github(username)
+
+def dep_repo(github: Github, repository: int) -> Repository:
+    return github.get_repo(repository)
+
+class GithubRepositoryController(Controller):
+    path = "/gh/{username:str}/repositories/{repository:int}"
+    dependencies = {"user": Provide(dep_user), "github": Provide(dep_github), "repo": Provide(dep_repo)}
+
+    @get("")
+    async def get_repo(self, repo: Repository, request: Request) -> GithubRepository:
+        return GithubRepository.from_repo(repo)
+    
+    @get("/scan")
+    async def check_repo(self, app_state: AppState, username: str, repository: int, branch: Optional[str] = "main") -> Union[bool, Scan]:
+        results = Scan.load(app_state.database, query={"user": username, "repository": repository, "branch": branch})
+        if len(results) == 0:
+            return False
+        else:
+            return results[0]
+    
+    @post("/scan")
+    async def scan_repo(self, app_state: AppState, username: str, repo: Repository, branch: Optional[str] = "main") -> Scan:
+        results: list[Scan] = Scan.load(app_state.database, query={"user": username, "repository": repo.id, "branch": branch})
+        if len(results) == 0:
+            return Scan.scan(app_state.database, username, repo, branch=branch)
+        else:
+            results[0].update()
+            return results[0]
+    
+    @get("/branches")
+    async def get_branches(self, repo: Repository) -> list[str]:
+        branches = repo.get_branches()
+        return [i.name for i in branches]
