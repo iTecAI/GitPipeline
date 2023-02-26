@@ -9,17 +9,18 @@ import {
     Group,
     Badge,
     useMantineTheme,
+    ActionIcon,
 } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdRemoveRedEye, MdSearch, MdStar } from "react-icons/md";
+import { MdCheck, MdClose, MdRemoveRedEye, MdSearch, MdStar } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { Pagination } from "../../types/generic";
 import { GithubRepository } from "../../types/githubAccounts";
 import "./style.scss";
 import gh_colors from "../../resources/gh_colors.json";
 import numeral from "numeral";
-import {GoRepoForked} from "react-icons/go";
+import { GoRepoForked } from "react-icons/go";
 
 function RepositoryItem(props: GithubRepository) {
     const theme = useMantineTheme();
@@ -103,6 +104,8 @@ export function RepositoriesPage() {
         useState<Pagination<GithubRepository> | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const { t } = useTranslation();
+    const [search, setSearch] = useState<string>("");
+    const [lastSearch, setLastSearch] = useState<string>("");
 
     useMemo(
         () =>
@@ -122,6 +125,28 @@ export function RepositoriesPage() {
         }
     }, [gh_account]);
 
+    function updateSearch() {
+        setLastSearch(search);
+        if (search.length === 0) {
+            Pagination.paginate<GithubRepository>(
+                `/gh/${gh_account}/repositories`
+            ).then((value) => {
+                setPaginator(value);
+                setRepos(value.content);
+                setPage(1);
+            });
+        } else {
+            Pagination.paginate<GithubRepository>(
+                `/gh/${gh_account}/repositories`,
+                { search }
+            ).then((value) => {
+                setPaginator(value);
+                setRepos(value.content);
+                setPage(1);
+            });
+        }
+    }
+
     return paginator ? (
         <Box className="repo-box">
             <Stack spacing={16}>
@@ -129,6 +154,34 @@ export function RepositoriesPage() {
                     label={t("pages.repos.search")}
                     placeholder={t("pages.repos.search_placeholder") ?? ""}
                     icon={<MdSearch />}
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                            updateSearch();
+                        }
+                    }}
+                    rightSection={
+                        lastSearch !== search ? (
+                            <ActionIcon
+                                color="teal"
+                                radius={"xl"}
+                                variant="filled"
+                                onClick={() => updateSearch()}
+                            >
+                                <MdCheck />
+                            </ActionIcon>
+                        ) : (
+                            <ActionIcon
+                                color="gray"
+                                radius={"xl"}
+                                variant="subtle"
+                                onClick={() => {setSearch(""); updateSearch();}}
+                            >
+                                <MdClose />
+                            </ActionIcon>
+                        )
+                    }
                 />
                 <Paper withBorder className="repo-list" p="sm">
                     {loading ? (

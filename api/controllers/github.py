@@ -125,19 +125,25 @@ class GithubUserController(Controller):
         dependencies={"user": Provide(dep_user)},
     )
     async def count_user_repositories(self, username: str, user: User) -> int:
-        gh_user = user.get_github(username)
+        gh_user = user.get_github(username).get_user()
         return gh_user.get_repos().totalCount
 
     @get(
         "/repositories", guards=[is_logged_in], dependencies={"user": Provide(dep_user)}
     )
     async def get_user_repositories(
-        self, username: str, user: User, page: Optional[int] = 0
+        self, username: str, user: User, page: Optional[int] = 0, search: Optional[str] = ""
     ) -> PaginatedResponse:
-        gh_user = user.get_github(username)
-        repos = gh_user.get_repos(sort="updated")
-        last_page = int(parse_qs(urlparse(repos._getLastPageUrl()).query)["page"][0])
-        if page < 0 or page >= last_page:
+        gh_user = user.get_github(username).get_user()
+        if len(search) == 0:
+            repos = gh_user.get_repos(sort="updated")
+        else:
+            repos = user.get_github(username).search_repositories(search, user=username)
+        try:
+            last_page = int(parse_qs(urlparse(repos._getLastPageUrl()).query)["page"][0])
+        except:
+            last_page = 0
+        if page < 0 or page >= last_page and last_page != 0:
             raise ApplicationException(
                 code=400, error_name="err.pagination.invalid_page"
             )

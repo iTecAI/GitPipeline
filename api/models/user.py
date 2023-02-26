@@ -52,12 +52,12 @@ class User(BaseORM):
     def encode_user_to_secret(user: AuthenticatedUser) -> str:
         return "_gh_auth-" + sha256(f"{user.login}-{user.id}".encode("utf-8")).hexdigest()
 
-    def get_github(self, username: str) -> AuthenticatedUser:
+    def get_github(self, username: str) -> Github:
         for i in self.accounts:
             if i["username"] == username:
                 if i["token"]:
                     try:
-                        return Github(i["token"]).get_user()
+                        return Github(i["token"])
                     except:
                         i["token"] = None
                         self.save()
