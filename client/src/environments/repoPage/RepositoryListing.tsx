@@ -1,9 +1,11 @@
-import { Group, Paper, Stack, Text } from "@mantine/core";
+import { Badge, Group, Paper, Stack, Text } from "@mantine/core";
 import numeral from "numeral";
 import { useEffect, useState } from "react";
-import { IoMdDocument } from "react-icons/io";
+import { IoLogoGithub, IoMdDocument } from "react-icons/io";
+import { FaDocker } from "react-icons/fa";
 import { MdFolder } from "react-icons/md";
 import { RepositoryScan, ScanFile } from "../../types/githubAccounts";
+import { ReactComponent as GitPipeline } from "../../assets/logo.svg";
 
 function FileItem(props: ScanFile): JSX.Element {
     return (
@@ -11,8 +13,25 @@ function FileItem(props: ScanFile): JSX.Element {
             <Group spacing={8}>
                 <IoMdDocument />
                 <Text className="file-name">{props.name}</Text>
+                {props.parseable && (
+                    <Badge
+                        color="teal"
+                        className="file-parse"
+                        leftSection={
+                            {
+                                docker: <FaDocker />,
+                                actions: <IoLogoGithub />,
+                                pipeline: <GitPipeline />,
+                            }[props.parseable] ?? undefined
+                        }
+                    >
+                        {props.parseable}
+                    </Badge>
+                )}
             </Group>
-            <Text className="file-size" color="dimmed">{numeral(props.size).format("0.0 b")}</Text>
+            <Text className="file-size" color="dimmed">
+                {numeral(props.size).format("0.0 b")}
+            </Text>
         </Paper>
     );
 }
@@ -44,11 +63,22 @@ export function RepositoryListing(props: RepositoryScan): JSX.Element {
     const [files, setFiles] = useState<ScanFile[]>([]);
     useEffect(() => {
         const newFolders: string[] = [];
-        for (const f of props.files.filter(
-            (v) => v.directory.split("/").slice(0, -1).join("/") === displaying
-        )) {
-            if (!newFolders.includes(f.directory)) {
-                newFolders.push(f.directory);
+        const added: string[] = [];
+        for (const f of props.files) {
+            if (
+                f.directory !== displaying &&
+                f.directory.length > displaying.length &&
+                f.directory.split(displaying + "/", 2).length > 1 &&
+                !added.includes(
+                    f.directory.split(displaying + "/", 2)[1].split("/")[0]
+                )
+            ) {
+                newFolders.push(
+                    f.directory.split(displaying + "/", 2)[1].split("/")[0]
+                );
+                added.push(
+                    f.directory.split(displaying + "/", 2)[1].split("/")[0]
+                );
             }
         }
         setFolders(newFolders);
@@ -75,7 +105,7 @@ export function RepositoryListing(props: RepositoryScan): JSX.Element {
                 </Paper>
             )}
             {folders.map((v) => (
-                <FolderItem path={v} setPath={setDisplaying} key={v} />
+                <FolderItem path={v} setPath={(path) => setDisplaying(`${displaying}/${path}`)} key={v} />
             ))}
             {files.map((v) => (
                 <FileItem {...v} key={v.name} />

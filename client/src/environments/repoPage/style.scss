@@ -78,6 +78,14 @@
                     right: 16px;
                     transform: translate(0, -50%);
                 }
+
+                .file-parse {
+                    svg {
+                        height: 16px;
+                        width: auto;
+                        transform: translate(-4px, 2px);
+                    }
+                }
             }
         }
     }
