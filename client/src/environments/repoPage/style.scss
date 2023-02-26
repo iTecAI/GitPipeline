@@ -20,4 +20,65 @@
             transform: translate(-4px, 2px);
         }
     }
+
+    & > .mantine-Stack-root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        .repo-contents {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+            position: relative;
+            max-height: calc(100% - 72px);
+            overflow: auto;
+
+            .no-scan {
+                position: absolute;
+                top: calc(50% - 48px);
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0.6;
+                user-select: none;
+
+                svg {
+                    width: auto;
+                    height: 20vh;
+                }
+
+                .no-scan-text {
+                    position: absolute;
+                    bottom: -48px;
+                    left: 50%;
+                    transform: translate(-50%, 0px);
+                    width: fit-content;
+                    white-space: nowrap;
+                    font-size: 24px;
+                    text-transform: uppercase;
+                }
+            }
+
+            .file-item {
+                & svg {
+                    width: 20px;
+                    height: auto;
+                }
+                position: relative;
+                &.folder {
+                    cursor: pointer;
+                    &:hover {
+                        background-color: var(--mantine-color-dark-6);
+                    }
+                }
+
+                .file-size {
+                    position: absolute;
+                    top: 50%;
+                    right: 16px;
+                    transform: translate(0, -50%);
+                }
+            }
+        }
+    }
 }

@@ -43,7 +43,8 @@
         },
         "repo_details": {
             "scanned": "Scanned",
-            "scan_button": "Scan Branch"
+            "scan_button": "Scan Branch",
+            "not_scanned": "Branch has not been scanned"
         }
     },
     "generic": {

@@ -5,8 +5,10 @@ import {
     Divider,
     Group,
     Loader,
+    Paper,
     Select,
     Stack,
+    Text,
     Title,
     useMantineTheme,
 } from "@mantine/core";
@@ -16,11 +18,17 @@ import { GithubRepository, RepositoryScan } from "../../types/githubAccounts";
 import { get, post } from "../../utils/api";
 import gh_colors from "../../resources/gh_colors.json";
 import "./style.scss";
-import { MdDocumentScanner, MdRemoveRedEye, MdStar } from "react-icons/md";
+import {
+    MdDocumentScanner,
+    MdOutlineDocumentScanner,
+    MdRemoveRedEye,
+    MdStar,
+} from "react-icons/md";
 import numeral from "numeral";
 import { GoRepoForked } from "react-icons/go";
 import { IoMdGitBranch } from "react-icons/io";
 import { useTranslation } from "react-i18next";
+import { RepositoryListing } from "./RepositoryListing";
 
 export function RepositoryDetailsPage() {
     const { gh_account, repository } = useParams() as {
@@ -178,14 +186,27 @@ export function RepositoryDetailsPage() {
                             <>
                                 {t("pages.repo_details.scanned")} :{" "}
                                 {scan
-                                    ? new Date(scan.timestamp * 1000)
-                                          .toDateString()
+                                    ? new Date(
+                                          scan.timestamp * 1000
+                                      ).toDateString()
                                     : t("generic.never")}
                             </>
                         </Badge>
                     </Group>
                 </Stack>
                 <Divider />
+                <Paper className="repo-contents" withBorder p="sm">
+                    {scan ? (
+                        <RepositoryListing {...scan} />
+                    ) : (
+                        <Box className="no-scan">
+                            <MdOutlineDocumentScanner />
+                            <Text className="no-scan-text">
+                                {t("pages.repo_details.not_scanned")}
+                            </Text>
+                        </Box>
+                    )}
+                </Paper>
             </Stack>
         </Box>
     ) : (
