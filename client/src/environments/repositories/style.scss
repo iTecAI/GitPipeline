@@ -24,6 +24,34 @@
 
             .repo-item {
                 background-color: var(--mantine-color-dark-6);
+                position: relative;
+
+                .stats {
+                    position: absolute;
+                    top: 50%;
+                    right: 8px;
+                    transform: translate(0, -50%);
+
+                    .stat {
+                        padding: 8px;
+                        padding-bottom: 16px;
+                        box-sizing: border-box;
+                        position: relative;
+
+                        svg {
+                            width: 20px;
+                            height: 20px;
+                        }
+
+                        .mantine-Text-root {
+                            position: absolute;
+                            bottom: 4px;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+                            font-size: 12px;
+                        }
+                    }
+                }
             }
         }
         .pagination {

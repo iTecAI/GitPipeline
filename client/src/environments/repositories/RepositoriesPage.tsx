@@ -5,19 +5,91 @@ import {
     Stack,
     TextInput,
     Pagination as UIPagination,
+    Text,
+    Group,
+    Badge,
+    useMantineTheme,
 } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdSearch } from "react-icons/md";
+import { MdRemoveRedEye, MdSearch, MdStar } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { Pagination } from "../../types/generic";
 import { GithubRepository } from "../../types/githubAccounts";
 import "./style.scss";
+import gh_colors from "../../resources/gh_colors.json";
+import numeral from "numeral";
+import {GoRepoForked} from "react-icons/go";
 
 function RepositoryItem(props: GithubRepository) {
+    const theme = useMantineTheme();
     return (
         <Paper className="repo-item" p="xs">
-            {props.name}
+            <Stack spacing={4}>
+                <Text className="repo-name" size="md">
+                    {props.name}
+                </Text>
+                <Group spacing={4}>
+                    <Badge
+                        className="tag visibility"
+                        color={
+                            props.visibility === "public" ? "green" : "yellow"
+                        }
+                        size="sm"
+                    >
+                        {props.visibility}
+                    </Badge>
+                    {props.language && (
+                        <Badge
+                            className="tag language"
+                            size="sm"
+                            style={
+                                gh_colors[
+                                    props.language as keyof typeof gh_colors
+                                ] &&
+                                gh_colors[
+                                    props.language as keyof typeof gh_colors
+                                ].color
+                                    ? {
+                                          backgroundColor:
+                                              gh_colors[
+                                                  props.language as keyof typeof gh_colors
+                                              ].color + "33",
+                                          color: theme.fn.lighten(
+                                              gh_colors[
+                                                  props.language as keyof typeof gh_colors
+                                              ].color as string,
+                                              0.75
+                                          ),
+                                      }
+                                    : undefined
+                            }
+                        >
+                            {props.language}
+                        </Badge>
+                    )}
+                </Group>
+            </Stack>
+            <Group spacing={8} className="stats">
+                <Paper className="stars stat">
+                    <MdStar />
+                    <Text color="dimmed">
+                        {numeral(props.stars).format("0a")}
+                    </Text>
+                </Paper>
+                <Paper className="forks stat">
+                    <GoRepoForked />
+                    <Text color="dimmed">
+                        {numeral(props.forks).format("0a")}
+                    </Text>
+                </Paper>
+                <Paper className="watchers stat">
+                    <MdRemoveRedEye />
+                    <Text color="dimmed">
+                        {numeral(props.watchers).format("0a")}
+                    </Text>
+                </Paper>
+            </Group>
         </Paper>
     );
 }

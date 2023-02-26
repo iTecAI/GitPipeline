@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from starlite import Controller, get, Provide
 from util._types import AppState, PaginatedResponse
 from util.exceptions import ApplicationException
@@ -29,6 +29,8 @@ class GithubRepository(BaseModel):
     forks: int
     stars: int
     watchers: int
+    language: Union[str, None]
+    visibility: str
 
     @classmethod
     def from_repo(cls, repo: Repository):
@@ -39,6 +41,8 @@ class GithubRepository(BaseModel):
             forks=repo.forks_count,
             stars=repo.stargazers_count,
             watchers=repo.watchers_count,
+            language=repo.language,
+            visibility=repo.visibility
         )
 
 

@@ -11,4 +11,6 @@ export type GithubRepository = {
     forks: number;
     stars: number;
     watchers: number;
+    language: string | null;
+    visibility: string;
 };
